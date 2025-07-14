@@ -98,8 +98,25 @@ func (s ParcelService) Delete(number int) error {
 
 func main() {
 	// настройте подключение к БД
-
-	store := // создайте объект ParcelStore функцией NewParcelStore
+	db, err := sql.Open("sqlite", ":memory:")
+	if err != nil {
+		panic(err)
+	}
+	defer db.Close()
+	// Создание таблицы
+	_, err = db.Exec(`
+	CREATE TABLE IF NOT EXISTS parcel (
+		number INTEGER PRIMARY KEY AUTOINCREMENT,
+		client INTEGER NOT NULL,
+		status TEXT NOT NULL,
+		address TEXT NOT NULL,
+		created_at TEXT NOT NULL
+	)
+	`)
+	if err != nil {
+		panic(err)
+	}
+	store := NewParcelStore(db) // создайте объект ParcelStore функцией
 	service := NewParcelService(store)
 
 	// регистрация посылки
@@ -163,7 +180,7 @@ func main() {
 	}
 
 	// вывод посылок клиента
-	// здесь не должно быть последней посылки, т.к. она должна была успешно удалиться
+	// здесь не должно быть последней посылки, т.к. она должна была успешно удалитьс
 	err = service.PrintClientParcels(client)
 	if err != nil {
 		fmt.Println(err)
